@@ -1,4 +1,4 @@
-import { StyleSheet, Text, Button, View, TextInput, Picker, Switch, Image } from 'react-native';
+import { StyleSheet, Text, Button, View, TextInput, Picker, Switch, Image, TouchableOpacity } from 'react-native';
 import { NavigationContainer, PreventRemoveProvider } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -80,90 +80,260 @@ function UserScreen({navigation}){
   );
 }
 
-function ProfileScreen({ route }) {
-  return (
-    <View style={styles.container}>
-      <Text>Perfil: {route.params.user}</Text>
-    </View>
-  );
-}
-
 function AccountScreen({ route }) {
-  return (
-    <View style={styles.container}>
-      <Text>Cuenta: {route.params.user}</Text>
-    </View>
-  );
-}
-
-
-function Form () {
-  const [values, setValues] = React.useState({
-    Nrodecuenta: "",
-    identificacion: "",
-    titulardelacuenta: "",
-    fecha: "",
-    saldo: "",
+  
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      id: "",
+      holderAccount: "",
+      date: "",
+      balance: "",
+    },
   });
-  function handleSubmit(evt) {
-    evt.preventDefault();
-    // Aquí puedes usar values para enviar la información
-  }
-  function handleChange(evt) {
-    const { target } = evt;
-    const { name, value } = target;
-    const newValues = {
-      ...values,
-      [name]: value,
-    };
-    setValues(newValues);
-  }
+
+  const getNroAccount = () => Math.floor(Math.random() * 100);
+
+  const [nroAccount, setNroAccount] = useState(getNroAccount());
+  const [complete, setComplete] = useState(false);
+  const [data, setData] = useState({});
+
+  const onSubmit = (data) => {
+    setComplete(!complete);
+    setData(data);
+    reset();
+  };
+
+  
+  const handleResult = (data) => {
+    return (
+      
+      <View style={{ marginTop: 50 }}>
+        <Text key={data.nroAccount} style={styles.inputs}>
+          Número de cuenta {nroAccount}
+        </Text>
+        <Text key={data.nroAccount} style={styles.inputs}>
+          Identificación: {data.id}
+        </Text>
+        <Text key={data.nroAccount} style={styles.inputs}>
+          Titular de la cuenta: {data.holderAccount}
+        </Text>
+        <Text key={data.nroAccount} style={styles.inputs}>
+          Fecha: {data.date}
+        </Text>
+        <Text key={data.nroAccount} style={styles.inputs}>
+          Saldo: {data.balance}
+        </Text>
+      </View>
+    );
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="nrodecuenta">Nro de cuenta</label>
-      <input
-        id="nrodecuenta"
-        name="nrodecuenta"
-        type="text"
-        value={values.nrodecuenta}
-        onChange={handleChange}
-      />
-      <label htmlFor="identificacion">Identificacion</label>
-      <input
-        id="identificacion"
-        name="identificacion"
-        type="numb"
-        value={values.identificacion}
-        onChange={handleChange}
-      />
-      <label htmlFor="titulardelacuenta">Titular de la cuenta</label>
-      <input
-        id="titulardelacuenta"
-        name="titulardelacuenta"
-        type="text"
-        value={values.titulardelacuenta}
-        onChange={handleChange}
-      />
-      <label htmlFor="fecha">Fecha</label>
-      <input
-        id="fecha"
-        name="fecha"
-        type="date"
-        value={values.fecha}
-        onChange={handleChange}
-      />
-      <label htmlFor="saldo">Saldo</label>
-      <input
-        id="saldo"
-        name="saldo"
-        type="num"
-        value={values.saldo}
-        onChange={handleChange}
-      />
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#AAEBD7' }}>
+      <Image
+        style={{ width: 150, height: 150, marginBottom: 15 }}
+        source={require("./assets/cuenta.png")}
+      /> 
+      {/* <Image style={styles.images} source={require("../assets/card.png")} /> */}
+      <View
+        style={{
+          display: !complete ? "flex" : "none",
+          justifyContent: "center",
+          alignContent: "center",
+        }}
+      >
+        <Text style={{ color: "#358266", fontWeight: 700, fontSize: 25, marginTop: 10, textAlign: 'center' }}>
+          Bienvenido {route.params.user}
+        </Text>
+        <Text style={{ color: "#358266", fontSize: 14, marginTop: 5 }}>
+          Ingrese los siguientes datos para su transacción
+        </Text>
 
+        <View style={styles.content}>
+          <TextInput defaultValue={nroAccount} style={styles.inputs} disabled />
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+              maxLength: 12,
+              minLength: 3,
+              pattern: /^[0-9]+$/i,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={[
+                  styles.inputs,
+                  {
+                    borderColor:
+                      errors.id?.type == "required" ||
+                        errors.id?.type == "pattern" ||
+                        errors.id?.type == "minLength" ||
+                        errors.id?.type == "maxLength"
+                        ? "red"
+                        : "#11A88C",
+                  },
+                ]}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                placeholder="Identificación ..."
+              />
+            )}
+            name="id"
+          />
 
-      <button style={styles.colorBtn} type="submit">Enviar</button>
-    </form>
+          {errors.id?.type == "required" && (
+            <Text style={{ color: "red" }}>The id is required</Text>
+          )}
+          {errors.id?.type == "pattern" && (
+            <Text style={{ color: "red" }}>Only numbers</Text>
+          )}
+          {errors.id?.type == "maxLength" && (
+            <Text style={{ color: "red" }}>Max 12 characters</Text>
+          )}
+          {errors.id?.type == "minLength" && (
+            <Text style={{ color: "red" }}>Min 3 characters</Text>
+          )}
+
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+              maxLength: 20,
+              minLength: 3,
+              pattern: /^[A-Za-z\s]+$/g,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={[
+                  styles.inputs,
+                  {
+                    borderColor:
+                      errors.holderAccount?.type == "required" ||
+                        errors.holderAccount?.type == "pattern" ||
+                        errors.holderAccount?.type == "minLength" ||
+                        errors.holderAccount?.type == "maxLength"
+                        ? "red"
+                        : "#11A88C",
+                  },
+                ]}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                placeholder="Titular de la cuenta ..."
+              />
+            )}
+            name="holderAccount"
+          />
+
+          {errors.holderAccount?.type == "required" && (
+            <Text style={{ color: "red" }}>The Holder Account is required</Text>
+          )}
+          {errors.holderAccount?.type == "pattern" && (
+            <Text style={{ color: "red" }}>Only letters and/or spaces</Text>
+          )}
+          {errors.holderAccount?.type == "maxLength" && (
+            <Text style={{ color: "red" }}>Max 20 characters</Text>
+          )}
+          {errors.holderAccount?.type == "minLength" && (
+            <Text style={{ color: "red" }}>Min 3 characters</Text>
+          )}
+
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+              pattern: /^([0-2][0-9]|3[0-1])(\/|-)(0[1-9]|1[0-2])\2(\d{4})$/i,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={[
+                  styles.inputs,
+                  {
+                    borderColor:
+                      errors.date?.type == "required" ||
+                        errors.date?.type == "pattern"
+                        ? "red"
+                        : "#11A88C",
+                  },
+                ]}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                placeholder="Fecha (dd/mm/yy)"
+              />
+            )}
+            name="date"
+          />
+
+          {errors.date?.type == "required" && (
+            <Text style={{ color: "red" }}>The date is required</Text>
+          )}
+          {errors.date?.type == "pattern" && (
+            <Text style={{ color: "red" }}>Only date</Text>
+          )}
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+              pattern:
+                /^(1[0-9][0-9][0-9][0-9][0-9][0-9]|1[0-9][0-9][0-9][0-9][0-9][0-9][0-9]|100000000)$/,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={[
+                  styles.inputs,
+                  {
+                    borderColor:
+                      errors.balance?.type == "required" ||
+                        errors.balance?.type == "pattern" ||
+                        errors.balance?.type == "minLength" ||
+                        errors.balance?.type == "maxLength"
+                        ? "red"
+                        : "#11A88C",
+                  },
+                ]}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                placeholder="Saldo ..."
+              />
+            )}
+            name="balance"
+          />
+
+          {errors.balance?.type == "required" && (
+            <Text style={{ color: "red" }}>The balance is required</Text>
+          )}
+          {errors.balance?.type == "pattern" && (
+            <Text style={{ color: "red" }}>
+              Only numbers between 1 million and 100 million
+            </Text>
+          )}
+
+          <Button style={styles.colorBtn}
+            title="Validar"
+            onPress={handleSubmit(onSubmit)}
+          />
+        </View>
+      </View>
+      <View style={{ display: complete ? "flex" : "none" }}>
+        <Text style={{ color: "#358266", fontWeight: 700, fontSize: 25, textAlign: 'center' }}>
+          Bien Echo!!
+        </Text>
+        {handleResult(data)}
+        <Button
+          style={styles.button}
+          onPress={() => setComplete(!complete)}
+        >
+          <Text style={styles.buttonText}>Atras</Text>
+        </Button>
+      </View>
+    </View>
   );
 }
 
@@ -182,8 +352,8 @@ function SettingsScreen() {
 
 function MovScreen() {
   return (
-    <View style={styles.container}>
-      <Text>Movimientos</Text>
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#AAEBD7' }}>
+      <Text style={{ color: "#277EF5", fontWeight: 700, fontSize: 30 }}>Movimientos</Text>
     </View>
   );
 }
@@ -232,12 +402,13 @@ const styles = StyleSheet.create({
   },
   inputs: {
     borderWidth: 1,
-    borderColor: 'green',
+    borderColor: '#11A88C',
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 10,
     textAlign: 'center',
-    marginBottom: 5
+    marginBottom: 5,
+    
   },
   formulario: {
     fontSize: 18,
@@ -270,11 +441,15 @@ const styles = StyleSheet.create({
     width: 180, 
     margin:5, 
     borderWidth: 1,
-    borderColor: 'green',
+    borderColor: '#11A88C',
     borderRadius: 10,
   },
-  imagen:{
-
-  }
+  content: {
+    flexDirection: "column",
+    alignContent: "center",
+    justifyContent: "center",
+    marginTop: 5,
+  },
+ 
 });
 
