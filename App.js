@@ -27,7 +27,7 @@ function UserScreen({navigation}){
   };
   
   return(
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor:'#AAEBD7' }}>
         <Image
             style={{ width: 200, height: 200, marginBottom: 15 }}
             source={require("./assets/bank.png")}
@@ -95,6 +95,8 @@ function AccountScreen({ route }) {
     </View>
   );
 }
+
+
 
 function Form () {
   const [values, setValues] = React.useState({
@@ -188,6 +190,22 @@ function MovScreen() {
 }
 
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#CFFFFE",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  images: {
+    width: 170,
+    height: 140,
+  },
+});
+
+export default MovementScreen;
+
+
 const Tab = createBottomTabNavigator();
 
 function HomeTabs() {
@@ -232,6 +250,7 @@ const styles = StyleSheet.create({
   inputs: {
     borderWidth: 1,
     borderColor: 'green',
+    backgroundColor: 'white',
     borderRadius: 10,
     padding: 10,
     textAlign: 'center',
@@ -250,12 +269,12 @@ const styles = StyleSheet.create({
   }, 
   colorBtn: {
     borderWidth: 1,
-    borderColor: '#007BFF',
+    borderColor: 'black',
     backgroundColor: '#007BFF',
     padding: 15,
     marginLeft: 20,
     marginRight: 20,
-    borderRadius: 7,
+    borderRadius: 10,
   },
   errorText: {
     fontSize: 14,
