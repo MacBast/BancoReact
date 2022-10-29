@@ -97,7 +97,6 @@ function AccountScreen({ route }) {
 }
 
 
-
 function Form () {
   const [values, setValues] = React.useState({
     Nrodecuenta: "",
@@ -188,22 +187,6 @@ function MovScreen() {
     </View>
   );
 }
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#CFFFFE",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  images: {
-    width: 170,
-    height: 140,
-  },
-});
-
-export default MovementScreen;
 
 
 const Tab = createBottomTabNavigator();
